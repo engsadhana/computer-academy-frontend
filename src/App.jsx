@@ -1,130 +1,25 @@
 import "./App.css";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Students from './pages/students'
+import Navbar from "./components/navbar";
 
 function App() {
-  const [students, setStudents] = useState([]);
-const [showForm, setShowForm] = useState(false);
-
-const [name, setName] = useState("");
-const [email, setEmail] = useState("");
-const [mobile, setMobile] = useState("");
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/students")
-      .then((res) => res.json())
-      .then((data) => setStudents(data))
-      .catch((err) => console.log(err));
-  }, []);
-  const createStudent = async () => {
-  const response = await fetch("http://127.0.0.1:8000/students", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name,
-      email,
-      mobile,
-    }),
-  });
-
-  const data = await response.json();
-  console.log(data);
-};
-
+ 
 
   return (
-    <div className="container">
-      <h1>Shree Digital Computer Academy</h1>
-
-      <div className="cards">
-        <div className="card">
-          <h2>Students</h2>
-          <p>Manage Students</p>
-        </div>
-
-        <div className="card">
-          <h2>Courses</h2>
-          <p>Manage Courses</p>
-        </div>
-
-        <div className="card">
-          <h2>Admissions</h2>
-          <p>Manage Enrollments</p>
-        </div>
-      </div>
-
-      <div className="student-header">
-        <h2>Student List</h2>
-
-        <button className="add-btn" onClick={() => setShowForm(true)}>
-          + Add Student
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="form-container">
-          <h3>Add Student</h3>
-          <input
-            type="text"
-            placeholder="Enter Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <br />
-          <br />
-
-          <input
-            type="email"
-            placeholder="Enter Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <br />
-          <br />
-
-          <input
-            type="text"
-            placeholder="Enter Mobile"
-            value={mobile}
-            onChange={(e) => setMobile(e.target.value)}
-          />
-          <br />
-          <br />
-          <button onClick={createStudent}>
-  Create
-</button>
-
-          <button
-            onClick={() => setShowForm(false)}
-            style={{ marginLeft: "10px" }}
-          >
-            Cancel
-          </button>
-        </div>
-      )}
-
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Mobile</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {students.map((student) => (
-            <tr key={student.id}>
-              <td>{student.id}</td>
-              <td>{student.name}</td>
-              <td>{student.email}</td>
-              <td>{student.mobile}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <BrowserRouter>
+     <Navbar /> 
+      <Routes>
+        {/* Your other existing routes */}
+        <Route path="/" element={<Students />} />
+        
+        {/* 3. Add your students route here */}
+        <Route path="/students" element={<Students />} />
+      </Routes>
+    </BrowserRouter>
+  
+    
   );
 }
 
