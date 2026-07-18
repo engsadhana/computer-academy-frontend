@@ -1,9 +1,6 @@
-import React, { useState,useEffect } from "react";
-
+import React, { useState, useEffect } from "react";
 
 function Enrolment() {
-  const [student_id, setStudentId] = useState("");
-  const [course_id, setCourseId] = useState("");
   const [enrolled_fee, setEnrolledFee] = useState("");
   const [discount_applied, setDiscount] = useState("");
   const [expected_course_end_date, setExpected_course_end_date] = useState("");
@@ -12,9 +9,13 @@ function Enrolment() {
   const [enrolments, setEnrolments] = useState([]);
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState("");
-  
+  const [students, setStudents] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState("");
+  //first useEffect
+
   useEffect(() => {
     getCourses();
+    getStudents();
   }, []);
 
   const getCourses = async () => {
@@ -28,27 +29,85 @@ function Enrolment() {
       console.log(error);
     }
   };
+  // pull students list data
+  const getStudents = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/students");
 
-  const handleSubmit = () => {
+      const data = await response.json();
+
+      setStudents(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    // Validation
+
+    if (!selectedStudent) {
+      alert("Please select a student");
+      return;
+    }
+
+    if (!selectedCourse) {
+      alert("Please select a course");
+      return;
+    }
+
+    if (!enrolled_fee) {
+      alert("Please enter enrolled fee");
+      return;
+    }
+
+    if (!discount_applied) {
+      alert("Please enter discount");
+      return;
+    }
+
+    if (!expected_course_end_date) {
+      alert("Please select expected course end date");
+      return;
+    }
+
+    if (!enrolled_date) {
+      alert("Please select enrolled date");
+      return;
+    }
     const data = {
-      student_id: student_id,
-      course_id: course_id,
+      student_id: selectedStudent,
+
+      course_id: selectedCourse,
       enrolled_fee: enrolled_fee,
       discount_applied: discount_applied,
       expected_course_end_date: expected_course_end_date,
       enrolled_date: enrolled_date,
     };
 
-    setEnrolments([...enrolments, data]);
+    const response = await fetch("http://127.0.0.1:8000/enrollments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-    alert("Enrollment Successfully Added");
+    const data2 = await response.json();
 
-    setStudentId("");
-    setCourseId("");
-    setEnrolledFee("");
-    setDiscount("");
-    setExpected_course_end_date("");
-    setEnrolled_date("");
+    if (response.ok) {
+  setEnrolments([...enrolments, data2]);
+
+  alert("Enrollment Successfully Added");
+
+  setSelectedStudent("");
+  setSelectedCourse("");
+  setEnrolledFee("");
+  setDiscount("");
+  setExpected_course_end_date("");
+  setEnrolled_date("");
+} else {
+  alert("Something went wrong");
+}
   };
 
   return (
@@ -59,12 +118,18 @@ function Enrolment() {
         <label>Student ID</label>
         <br />
 
-        <input
-          type="number"
-          placeholder="Enter Student ID"
-          value={student_id}
-          onChange={(e) => setStudentId(e.target.value)}
-        />
+        <select
+          value={selectedStudent}
+          onChange={(e) => setSelectedStudent(e.target.value)}
+        >
+          <option value="">Select Student</option>
+
+          {students.map((student) => (
+            <option key={student.id} value={student.id}>
+              {student.name}
+            </option>
+          ))}
+        </select>
 
         <br />
         <br />
@@ -138,7 +203,9 @@ function Enrolment() {
         <br />
         <br />
 
-        <button onClick={handleSubmit} type="button">Enroll Student</button>
+        <button onClick={handleSubmit} type="button">
+          Enroll Student
+        </button>
       </div>
 
       <br />

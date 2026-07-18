@@ -34,6 +34,7 @@ function Students() {
 
   // Create Student
   const createStudent = async () => {
+    
     const response = await fetch("http://127.0.0.1:8000/students", {
       method: "POST",
       headers: {
