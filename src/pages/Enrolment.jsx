@@ -16,6 +16,7 @@ function Enrolment() {
   useEffect(() => {
     getCourses();
     getStudents();
+    getEnrollment();
   }, []);
 
   const getCourses = async () => {
@@ -41,7 +42,17 @@ function Enrolment() {
       console.log(error);
     }
   };
+  //get enrollment
+  const getEnrollment = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/enrollments");
+      const data = await response.json();
 
+      setEnrolments(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const handleSubmit = async () => {
     // Validation
 
@@ -95,19 +106,19 @@ function Enrolment() {
     const data2 = await response.json();
 
     if (response.ok) {
-  setEnrolments([...enrolments, data2]);
+      setEnrolments([...enrolments, data2]);
 
-  alert("Enrollment Successfully Added");
+      alert("Enrollment Successfully Added");
 
-  setSelectedStudent("");
-  setSelectedCourse("");
-  setEnrolledFee("");
-  setDiscount("");
-  setExpected_course_end_date("");
-  setEnrolled_date("");
-} else {
-  alert("Something went wrong");
-}
+      setSelectedStudent("");
+      setSelectedCourse("");
+      setEnrolledFee("");
+      setDiscount("");
+      setExpected_course_end_date("");
+      setEnrolled_date("");
+    } else {
+      alert("Something went wrong");
+    }
   };
 
   return (
