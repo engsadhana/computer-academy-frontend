@@ -1,11 +1,62 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 function Courses() {
+  const [name, setName] = useState("");
+  const [duration, setDuration] = useState("");
+  const [fees, setFees] = useState("");
+
+  const [courses, setCourses] = useState([]);
+  const [errors, setErrors] = useState({});
+
   return (
     <div className="container">
       <h2>Course List</h2>
 
-      <table>
+      <div className="form-container">
+        <label>Course Name</label>
+        <br />
+        <input
+          type="text"
+          placeholder="Enter Course Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <br />
+        <br />
+
+        <label>Duration</label>
+        <br />
+        <input
+          type="text"
+          placeholder="Example: 3 Months"
+          value={duration}
+          onChange={(e) => setDuration(e.target.value)}
+        />
+
+        <br />
+        <br />
+
+        <label>Course Fee</label>
+        <br />
+        <input
+          type="number"
+          placeholder="Enter Course Fee"
+          value={fees}
+          onChange={(e) => setFees(e.target.value)}
+        />
+
+        <br />
+        <br />
+
+        <button type="button">
+          Add Course
+        </button>
+      </div>
+
+      <br />
+
+      <table border="1">
         <thead>
           <tr>
             <th>ID</th>

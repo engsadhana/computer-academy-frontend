@@ -11,7 +11,8 @@ function Enrolment() {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState("");
-  //first useEffect
+
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     getCourses();
@@ -22,77 +23,81 @@ function Enrolment() {
   const getCourses = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/courses");
-
       const data = await response.json();
-
       setCourses(data);
     } catch (error) {
       console.log(error);
     }
   };
-  // pull students list data
+
   const getStudents = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/students");
-
       const data = await response.json();
-
       setStudents(data);
     } catch (error) {
       console.log(error);
     }
   };
-  //get enrollment
+
   const getEnrollment = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/enrollments");
       const data = await response.json();
-
       setEnrolments(data);
     } catch (error) {
       console.log(error);
     }
   };
+
   const handleSubmit = async () => {
-    // Validation
+    let newErrors = {};
 
     if (!selectedStudent) {
-      alert("Please select a student");
-      return;
+      newErrors.selectedStudent = "Please select a student";
     }
 
     if (!selectedCourse) {
-      alert("Please select a course");
-      return;
+      newErrors.selectedCourse = "Please select a course";
     }
 
     if (!enrolled_fee) {
-      alert("Please enter enrolled fee");
-      return;
+      newErrors.enrolled_fee = "Please enter enrolled fee";
+    } else if (Number(enrolled_fee) <= 0) {
+      newErrors.enrolled_fee = "Fee must be greater than 0";
     }
 
-    if (!discount_applied) {
-      alert("Please enter discount");
-      return;
+    // Discount Optional
+    if (discount_applied !== "") {
+      if (Number(discount_applied) < 0) {
+        newErrors.discount_applied = "Discount cannot be negative";
+      } else if (Number(discount_applied) > Number(enrolled_fee)) {
+        newErrors.discount_applied =
+          "Discount cannot be greater than enrolled fee";
+      }
     }
 
     if (!expected_course_end_date) {
-      alert("Please select expected course end date");
-      return;
+      newErrors.expected_course_end_date = "Please select expected end date";
     }
 
     if (!enrolled_date) {
-      alert("Please select enrolled date");
+      newErrors.enrolled_date = "Please select enrolled date";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
       return;
     }
+
     const data = {
       student_id: selectedStudent,
-
       course_id: selectedCourse,
-      enrolled_fee: enrolled_fee,
-      discount_applied: discount_applied,
-      expected_course_end_date: expected_course_end_date,
-      enrolled_date: enrolled_date,
+      enrolled_fee,
+      discount_applied,
+      expected_course_end_date,
+      enrolled_date,
     };
 
     const response = await fetch("http://127.0.0.1:8000/enrollments", {
@@ -116,6 +121,7 @@ function Enrolment() {
       setDiscount("");
       setExpected_course_end_date("");
       setEnrolled_date("");
+      setErrors({});
     } else {
       alert("Something went wrong");
     }
@@ -126,12 +132,15 @@ function Enrolment() {
       <h2>Student Enrolment</h2>
 
       <div className="form-container">
-        <label>Student ID</label>
+        <label>Student</label>
         <br />
 
         <select
           value={selectedStudent}
-          onChange={(e) => setSelectedStudent(e.target.value)}
+          onChange={(e) => {
+            setSelectedStudent(e.target.value);
+            setErrors({ ...errors, selectedStudent: "" });
+          }}
         >
           <option value="">Select Student</option>
 
@@ -142,7 +151,12 @@ function Enrolment() {
           ))}
         </select>
 
-        <br />
+        {errors.selectedStudent && (
+          <p style={{ color: "red", margin: "5px 0" }}>
+            {errors.selectedStudent}
+          </p>
+        )}
+
         <br />
 
         <label>Course</label>
@@ -150,7 +164,10 @@ function Enrolment() {
 
         <select
           value={selectedCourse}
-          onChange={(e) => setSelectedCourse(e.target.value)}
+          onChange={(e) => {
+            setSelectedCourse(e.target.value);
+            setErrors({ ...errors, selectedCourse: "" });
+          }}
         >
           <option value="">Select Course</option>
 
@@ -161,7 +178,12 @@ function Enrolment() {
           ))}
         </select>
 
-        <br />
+        {errors.selectedCourse && (
+          <p style={{ color: "red", margin: "5px 0" }}>
+            {errors.selectedCourse}
+          </p>
+        )}
+
         <br />
 
         <label>Enrolled Fee</label>
@@ -171,23 +193,37 @@ function Enrolment() {
           type="number"
           placeholder="Enter Course Fee"
           value={enrolled_fee}
-          onChange={(e) => setEnrolledFee(e.target.value)}
+          onChange={(e) => {
+            setEnrolledFee(e.target.value);
+            setErrors({ ...errors, enrolled_fee: "" });
+          }}
         />
 
-        <br />
+        {errors.enrolled_fee && (
+          <p style={{ color: "red", margin: "5px 0" }}>{errors.enrolled_fee}</p>
+        )}
+
         <br />
 
-        <label>Discount Applied</label>
+        <label>Discount Applied (Optional)</label>
         <br />
 
         <input
           type="number"
           placeholder="Enter Discount"
           value={discount_applied}
-          onChange={(e) => setDiscount(e.target.value)}
+          onChange={(e) => {
+            setDiscount(e.target.value);
+            setErrors({ ...errors, discount_applied: "" });
+          }}
         />
 
-        <br />
+        {errors.discount_applied && (
+          <p style={{ color: "red", margin: "5px 0" }}>
+            {errors.discount_applied}
+          </p>
+        )}
+
         <br />
 
         <label>Expected Course End Date</label>
@@ -196,10 +232,21 @@ function Enrolment() {
         <input
           type="date"
           value={expected_course_end_date}
-          onChange={(e) => setExpected_course_end_date(e.target.value)}
+          onChange={(e) => {
+            setExpected_course_end_date(e.target.value);
+            setErrors({
+              ...errors,
+              expected_course_end_date: "",
+            });
+          }}
         />
 
-        <br />
+        {errors.expected_course_end_date && (
+          <p style={{ color: "red", margin: "5px 0" }}>
+            {errors.expected_course_end_date}
+          </p>
+        )}
+
         <br />
 
         <label>Enrolled Date</label>
@@ -208,13 +255,21 @@ function Enrolment() {
         <input
           type="date"
           value={enrolled_date}
-          onChange={(e) => setEnrolled_date(e.target.value)}
+          onChange={(e) => {
+            setEnrolled_date(e.target.value);
+            setErrors({ ...errors, enrolled_date: "" });
+          }}
         />
 
-        <br />
+        {errors.enrolled_date && (
+          <p style={{ color: "red", margin: "5px 0" }}>
+            {errors.enrolled_date}
+          </p>
+        )}
+
         <br />
 
-        <button onClick={handleSubmit} type="button">
+        <button type="button" onClick={handleSubmit}>
           Enroll Student
         </button>
       </div>
