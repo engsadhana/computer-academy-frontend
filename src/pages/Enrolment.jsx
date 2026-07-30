@@ -3,13 +3,15 @@ import React, { useState, useEffect } from "react";
 function Enrolment() {
   const [enrolled_fee, setEnrolledFee] = useState("");
   const [discount_applied, setDiscount] = useState("");
+
   const [expected_course_end_date, setExpected_course_end_date] = useState("");
   const [enrolled_date, setEnrolled_date] = useState("");
 
   const [enrolments, setEnrolments] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState("");
   const [students, setStudents] = useState([]);
+
+  const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedStudent, setSelectedStudent] = useState("");
 
   const [errors, setErrors] = useState({});
@@ -21,64 +23,41 @@ function Enrolment() {
   }, []);
 
   const getCourses = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/courses");
-      const data = await response.json();
-      setCourses(data);
-    } catch (error) {
-      console.log(error);
-    }
+    const response = await fetch("http://127.0.0.1:8000/courses");
+    const data = await response.json();
+    setCourses(data);
   };
 
   const getStudents = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/students");
-      const data = await response.json();
-      setStudents(data);
-    } catch (error) {
-      console.log(error);
-    }
+    const response = await fetch("http://127.0.0.1:8000/students");
+    const data = await response.json();
+    setStudents(data);
   };
 
   const getEnrollment = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/enrollments");
-      const data = await response.json();
-      setEnrolments(data);
-    } catch (error) {
-      console.log(error);
-    }
+    const response = await fetch("http://127.0.0.1:8000/enrollments");
+    const data = await response.json();
+    setEnrolments(data);
   };
 
   const handleSubmit = async () => {
     let newErrors = {};
 
     if (!selectedStudent) {
-      newErrors.selectedStudent = "Please select a student";
+      newErrors.selectedStudent = "Please select student";
     }
 
     if (!selectedCourse) {
-      newErrors.selectedCourse = "Please select a course";
+      newErrors.selectedCourse = "Please select course";
     }
 
     if (!enrolled_fee) {
-      newErrors.enrolled_fee = "Please enter enrolled fee";
-    } else if (Number(enrolled_fee) <= 0) {
-      newErrors.enrolled_fee = "Fee must be greater than 0";
-    }
-
-    // Discount Optional
-    if (discount_applied !== "") {
-      if (Number(discount_applied) < 0) {
-        newErrors.discount_applied = "Discount cannot be negative";
-      } else if (Number(discount_applied) > Number(enrolled_fee)) {
-        newErrors.discount_applied =
-          "Discount cannot be greater than enrolled fee";
-      }
+      newErrors.enrolled_fee = "Please enter fee";
     }
 
     if (!expected_course_end_date) {
-      newErrors.expected_course_end_date = "Please select expected end date";
+      newErrors.expected_course_end_date =
+        "Please select expected course end date";
     }
 
     if (!enrolled_date) {
@@ -108,10 +87,10 @@ function Enrolment() {
       body: JSON.stringify(data),
     });
 
-    const data2 = await response.json();
+    const result = await response.json();
 
     if (response.ok) {
-      setEnrolments([...enrolments, data2]);
+      setEnrolments([...enrolments, result]);
 
       alert("Enrollment Successfully Added");
 
@@ -133,14 +112,10 @@ function Enrolment() {
 
       <div className="form-container">
         <label>Student</label>
-        <br />
 
         <select
           value={selectedStudent}
-          onChange={(e) => {
-            setSelectedStudent(e.target.value);
-            setErrors({ ...errors, selectedStudent: "" });
-          }}
+          onChange={(e) => setSelectedStudent(e.target.value)}
         >
           <option value="">Select Student</option>
 
@@ -152,22 +127,16 @@ function Enrolment() {
         </select>
 
         {errors.selectedStudent && (
-          <p style={{ color: "red", margin: "5px 0" }}>
-            {errors.selectedStudent}
-          </p>
+          <p style={{ color: "red" }}>{errors.selectedStudent}</p>
         )}
 
         <br />
 
         <label>Course</label>
-        <br />
 
         <select
           value={selectedCourse}
-          onChange={(e) => {
-            setSelectedCourse(e.target.value);
-            setErrors({ ...errors, selectedCourse: "" });
-          }}
+          onChange={(e) => setSelectedCourse(e.target.value)}
         >
           <option value="">Select Course</option>
 
@@ -179,102 +148,62 @@ function Enrolment() {
         </select>
 
         {errors.selectedCourse && (
-          <p style={{ color: "red", margin: "5px 0" }}>
-            {errors.selectedCourse}
-          </p>
+          <p style={{ color: "red" }}>{errors.selectedCourse}</p>
         )}
 
         <br />
 
         <label>Enrolled Fee</label>
-        <br />
 
         <input
           type="number"
           placeholder="Enter Course Fee"
           value={enrolled_fee}
-          onChange={(e) => {
-            setEnrolledFee(e.target.value);
-            setErrors({ ...errors, enrolled_fee: "" });
-          }}
+          onChange={(e) => setEnrolledFee(e.target.value)}
         />
-
         {errors.enrolled_fee && (
-          <p style={{ color: "red", margin: "5px 0" }}>{errors.enrolled_fee}</p>
+          <p style={{ color: "red" }}>{errors.enrolled_fee}</p>
         )}
 
         <br />
 
         <label>Discount Applied (Optional)</label>
-        <br />
 
         <input
           type="number"
           placeholder="Enter Discount"
           value={discount_applied}
-          onChange={(e) => {
-            setDiscount(e.target.value);
-            setErrors({ ...errors, discount_applied: "" });
-          }}
+          onChange={(e) => setDiscount(e.target.value)}
         />
 
-        {errors.discount_applied && (
-          <p style={{ color: "red", margin: "5px 0" }}>
-            {errors.discount_applied}
-          </p>
+        <label>enrolled_date</label>
+        <input
+          type="date"
+          value={enrolled_date}
+          onChange={(e) => setEnrolled_date(e.target.value)}
+        />
+
+        {errors.enrolled_date && (
+          <p style={{ color: "red" }}>{errors.enrolled_date}</p>
         )}
 
         <br />
 
         <label>Expected Course End Date</label>
-        <br />
 
         <input
           type="date"
           value={expected_course_end_date}
-          onChange={(e) => {
-            setExpected_course_end_date(e.target.value);
-            setErrors({
-              ...errors,
-              expected_course_end_date: "",
-            });
-          }}
+          onChange={(e) => setExpected_course_end_date(e.target.value)}
         />
-
         {errors.expected_course_end_date && (
-          <p style={{ color: "red", margin: "5px 0" }}>
-            {errors.expected_course_end_date}
-          </p>
+          <p style={{ color: "red" }}>{errors.expected_course_end_date}</p>
         )}
 
         <br />
 
-        <label>Enrolled Date</label>
-        <br />
-
-        <input
-          type="date"
-          value={enrolled_date}
-          onChange={(e) => {
-            setEnrolled_date(e.target.value);
-            setErrors({ ...errors, enrolled_date: "" });
-          }}
-        />
-
-        {errors.enrolled_date && (
-          <p style={{ color: "red", margin: "5px 0" }}>
-            {errors.enrolled_date}
-          </p>
-        )}
-
-        <br />
-
-        <button type="button" onClick={handleSubmit}>
-          Enroll Student
-        </button>
+        <button onClick={handleSubmit}>Enroll Student</button>
       </div>
-
-      <br />
 
       <h3>Enrollment List</h3>
 
@@ -284,7 +213,7 @@ function Enrolment() {
             <th>ID</th>
             <th>Student ID</th>
             <th>Course ID</th>
-            <th>Enrolled Fee</th>
+            <th>Fee</th>
             <th>Discount</th>
             <th>Expected End Date</th>
             <th>Enrolled Date</th>
