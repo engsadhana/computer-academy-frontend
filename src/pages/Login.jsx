@@ -24,7 +24,7 @@ function Login() {
   return (
     <div className="login-container">
       <form className="login-box" onSubmit={handleLogin}>
-        <h2>Shree Digital Academy</h2>
+        <h2>Shree Digital Computer Academy</h2>
         <p className="subtitle">Student Management System</p>
 
         <input

@@ -1,6 +1,15 @@
-import { Link } from "react-router-dom";
+import "./Navbar.css";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("username");
+    navigate("/");
+  };
+
   return (
     <nav>
       <h2>Shree Digital Computer Academy</h2>
@@ -16,6 +25,10 @@ function Navbar() {
 
         <li>
           <Link to="/enrolment">Enrolment</Link>
+        </li>
+
+        <li>
+          <button onClick={handleLogout}>Logout</button>
         </li>
       </ul>
     </nav>
